@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: team-recruit-platform
+  
+  # 데이터베이스 설정
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: 
+  
+  # JPA 설정
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+  
+  # H2 Console 설정 (개발용)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+# JWT 설정
+jwt:
+  secret: your-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm-please-change-this-in-production
+  expiration: 86400000  # 24시간 (밀리초)
+  refresh-expiration: 604800000  # 7일 (밀리초)
+
+# 세종대학교 학사정보시스템 설정
+sejong:
+  portal:
+    login-url: https://portal.sejong.ac.kr/jsp/login/loginSSL.jsp
+    student-info-url: https://portal.sejong.ac.kr/user/index.do
+    base-url: https://portal.sejong.ac.kr
+    # 개발 모드 (true: 테스트용 더미 인증, false: 실제 포털 연동 시도)
+    dev-mode: true
+    # 테스트용 계정 (dev-mode가 true일 때만 사용)
+    test-accounts:
+      - studentId: "20211234"
+        password: "test1234"
+        name: "이고은"
+        department: "컴퓨터공학과"
+        grade: 3
+      - studentId: "20211235"
+        password: "test1234"
+        name: "황채영"
+        department: "소프트웨어학과"
+        grade: 3
+
+# 서버 설정
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+# 로깅 설정
+logging:
+  level:
+    com.sejong.recruit: DEBUG
+    org.springframework.security: DEBUG
