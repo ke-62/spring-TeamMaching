@@ -1,47 +1,41 @@
 package com.sejong.recruit.entity;
 
+import com.sejong.recruit.global.common.BaseTimeEntity;
+import com.sejong.recruit.enums.ApplicationStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
-
+/**
+ * 프로젝트 지원 내역 엔티티
+ */
 @Entity
-@Table(name = "applications")
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "applications")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-public class Application {
-    
+public class Application extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recruit_post_id", nullable = false)
-    private RecruitPost recruitPost;
-    
+    @JoinColumn(name = "project_id", nullable = false)
+    private Project project;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicant_id", nullable = false)
     private User applicant;
-    
-    @Column(nullable = false, length = 1000)
-    private String motivation;  // 지원 동기
-    
+
+    @Column(columnDefinition = "TEXT")
+    private String message;
+
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     @Builder.Default
     private ApplicationStatus status = ApplicationStatus.PENDING;
-    
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-    
-    public enum ApplicationStatus {
-        PENDING,   // 대기중
-        ACCEPTED,  // 수락됨
-        REJECTED   // 거절됨
+
+    public void updateStatus(ApplicationStatus status) {
+        this.status = status;
     }
 }

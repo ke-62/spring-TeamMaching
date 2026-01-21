@@ -2,8 +2,6 @@ package com.sejong.recruit.service;
 
 import com.sejong.recruit.dto.ReviewDto;
 import com.sejong.recruit.dto.UserDto;
-import com.sejong.recruit.entity.RecruitPost;
-import com.sejong.recruit.entity.Review;
 import com.sejong.recruit.entity.User;
 import com.sejong.recruit.repository.RecruitPostRepository;
 import com.sejong.recruit.repository.ReviewRepository;

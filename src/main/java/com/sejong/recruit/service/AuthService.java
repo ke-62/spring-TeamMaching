@@ -3,7 +3,7 @@ package com.sejong.recruit.service;
 import com.sejong.recruit.dto.AuthDto;
 import com.sejong.recruit.dto.UserDto;
 import com.sejong.recruit.entity.User;
-import com.sejong.recruit.exception.BusinessException;
+import com.sejong.recruit.global.exception.BusinessException;
 import com.sejong.recruit.repository.UserRepository;
 import com.sejong.recruit.util.JwtUtil;
 import lombok.RequiredArgsConstructor;

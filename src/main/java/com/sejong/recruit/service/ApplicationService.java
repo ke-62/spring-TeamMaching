@@ -2,9 +2,8 @@ package com.sejong.recruit.service;
 
 import com.sejong.recruit.dto.ApplicationDto;
 import com.sejong.recruit.entity.Application;
-import com.sejong.recruit.entity.RecruitPost;
 import com.sejong.recruit.entity.User;
-import com.sejong.recruit.exception.BusinessException;
+import com.sejong.recruit.global.exception.BusinessException;
 import com.sejong.recruit.repository.ApplicationRepository;
 import com.sejong.recruit.repository.RecruitPostRepository;
 import com.sejong.recruit.repository.UserRepository;

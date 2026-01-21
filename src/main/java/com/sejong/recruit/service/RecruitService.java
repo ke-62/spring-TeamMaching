@@ -1,9 +1,8 @@
 package com.sejong.recruit.service;
 
 import com.sejong.recruit.dto.RecruitDto;
-import com.sejong.recruit.entity.RecruitPost;
 import com.sejong.recruit.entity.User;
-import com.sejong.recruit.exception.BusinessException;
+import com.sejong.recruit.global.exception.BusinessException;
 import com.sejong.recruit.repository.RecruitPostRepository;
 import com.sejong.recruit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor

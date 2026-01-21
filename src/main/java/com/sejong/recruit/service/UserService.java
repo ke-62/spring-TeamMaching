@@ -2,7 +2,7 @@ package com.sejong.recruit.service;
 
 import com.sejong.recruit.dto.UserDto;
 import com.sejong.recruit.entity.User;
-import com.sejong.recruit.exception.BusinessException;
+import com.sejong.recruit.global.exception.BusinessException;
 import com.sejong.recruit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,5 @@
 package com.sejong.recruit.repository;
 
-import com.sejong.recruit.entity.Review;
 import com.sejong.recruit.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -1,4 +1,4 @@
-package com.sejong.recruit.config;
+package com.sejong.recruit.global.config;
 
 import com.sejong.recruit.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;

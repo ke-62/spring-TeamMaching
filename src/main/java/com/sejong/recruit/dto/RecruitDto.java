@@ -1,6 +1,5 @@
 package com.sejong.recruit.dto;
 
-import com.sejong.recruit.entity.RecruitPost;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
