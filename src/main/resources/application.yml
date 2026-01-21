@@ -31,6 +31,12 @@ jwt:
   expiration: 86400000  # 24시간 (밀리초)
   refresh-expiration: 604800000  # 7일 (밀리초)
 
+# AI Server Configuration
+ai:
+  api:
+    url: ${AI_SERVER_URL:http://localhost:5000} # 환경변수가 없으면 기본값으로 설정
+
+
 # 세종대학교 학사정보시스템 설정
 sejong:
   portal:
@@ -63,3 +69,6 @@ logging:
   level:
     com.sejong.recruit: DEBUG
     org.springframework.security: DEBUG
+
+
+
