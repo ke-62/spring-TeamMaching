@@ -21,7 +21,12 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_001", "사용자를 찾을 수 없습니다."),
 
     // Project
-    PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "PROJECT_001", "프로젝트를 찾을 수 없습니다.");
+    PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "PROJECT_001", "프로젝트를 찾을 수 없습니다."),
+
+    // Auth
+    PORTAL_LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "AUTH_001", "포털 로그인에 실패했습니다."),
+    PORTAL_COMMUNICATION_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "AUTH_002", "포털 서버와 통신 중 오류가 발생했습니다."),
+    PORTAL_PARSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AUTH_003", "포털 정보 파싱에 실패했습니다.");
 
     private final HttpStatus status;
     private final String code;
