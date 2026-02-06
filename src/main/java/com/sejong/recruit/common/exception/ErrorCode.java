@@ -21,7 +21,15 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_001", "사용자를 찾을 수 없습니다."),
 
     // Project
-    PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "PROJECT_001", "프로젝트를 찾을 수 없습니다.");
+    PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "PROJECT_001", "프로젝트를 찾을 수 없습니다."),
+
+    // Application
+    APPLICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "APP_001", "지원서를 찾을 수 없습니다."),
+    DUPLICATE_APPLICATION(HttpStatus.BAD_REQUEST, "APP_002", "이미 지원한 프로젝트입니다."),
+
+    // Auth
+    AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "AUTH_001", "인증에 실패했습니다."),
+    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AUTH_002", "토큰이 만료되었습니다.");
 
     private final HttpStatus status;
     private final String code;

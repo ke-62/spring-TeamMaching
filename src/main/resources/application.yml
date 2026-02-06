@@ -1,29 +1,23 @@
 spring:
   application:
     name: team-recruit-platform
-  
-  # 데이터베이스 설정
+
+  # MySQL 데이터베이스 설정
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password: 
-  
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/sejong_matching?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password:
+
   # JPA 설정
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.H2Dialect
-  
-  # H2 Console 설정 (개발용)
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+        dialect: org.hibernate.dialect.MySQLDialect
 
 # JWT 설정
 jwt:
@@ -34,8 +28,7 @@ jwt:
 # AI Server Configuration
 ai:
   api:
-    url: ${AI_SERVER_URL:http://localhost:5000} # 환경변수가 없으면 기본값으로 설정
-
+    url: ${AI_SERVER_URL:http://localhost:5000}
 
 # 세종대학교 학사정보시스템 설정
 sejong:
@@ -43,9 +36,7 @@ sejong:
     login-url: https://portal.sejong.ac.kr/jsp/login/loginSSL.jsp
     student-info-url: https://portal.sejong.ac.kr/user/index.do
     base-url: https://portal.sejong.ac.kr
-    # 개발 모드 (true: 테스트용 더미 인증, false: 실제 포털 연동 시도)
     dev-mode: true
-    # 테스트용 계정 (dev-mode가 true일 때만 사용)
     test-accounts:
       - studentId: "20211234"
         password: "test1234"
@@ -69,6 +60,3 @@ logging:
   level:
     com.sejong.recruit: DEBUG
     org.springframework.security: DEBUG
-
-
-
