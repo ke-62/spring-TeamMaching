@@ -34,6 +34,11 @@ public class AuthService {
         }
 
         User user = userRepository.findByStudentId(request.getStudentId())
+                .map(existingUser -> {
+                    existingUser.setFullName(studentInfo.getOrDefault("name", existingUser.getFullName()));
+                    existingUser.setMajor(studentInfo.getOrDefault("department", existingUser.getMajor()));
+                    return userRepository.save(existingUser);
+                })
                 .orElseGet(() -> createUserFromStudentInfo(request.getStudentId(), studentInfo));
 
         String accessToken = jwtUtil.generateAccessToken(user.getStudentId());

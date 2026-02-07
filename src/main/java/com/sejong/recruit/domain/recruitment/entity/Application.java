@@ -9,9 +9,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-/**
- * 프로젝트 지원서 엔티티
- */
 @Entity
 @Table(name = "applications")
 @Getter
@@ -31,21 +28,18 @@ public class Application {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicant_id", nullable = false)
-    private User applicant;  // 지원자
+    private User applicant;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String message;  // 지원 메시지 (한마디)
+    @Column(columnDefinition = "TEXT")
+    private String message;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     @Builder.Default
-    private ApplicationStatus status = ApplicationStatus.PENDING;  // PENDING, ACCEPTED, REJECTED
+    private ApplicationStatus status = ApplicationStatus.PENDING;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(nullable = false)
     private LocalDateTime updatedAt;
 }
