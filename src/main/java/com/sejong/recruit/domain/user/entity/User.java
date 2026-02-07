@@ -14,45 +14,51 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class
-User {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
-    private String email;  // 이메일
+    private String email;
 
-    private String passwordHash;  // 비밀번호 해시
+    private String passwordHash;
 
     @Column(nullable = false)
-    private String fullName;  // 이름
+    private String fullName;
 
     @Column(unique = true)
-    private String studentId;  // 학번
+    private String studentId;
 
-    private String major;  // 학과
+    private String university;
 
-    @Column(columnDefinition = "TEXT")
-    private String bio;  // 자기소개
+    @Column(name = "department")
+    private String major;
 
-    @Column(columnDefinition = "TEXT")
-    private String techStack;  // 기술스택 (쉼표 구분)
-
-    private String githubUrl;  // GitHub URL
+    @Builder.Default
+    private Boolean isAuthenticated = false;
 
     @Column(columnDefinition = "TEXT")
-    private String collaborationKeywords;  // 협업 키워드 (AI 분석 결과)
+    private String bio;
 
     @Column(columnDefinition = "TEXT")
-    private String aiSummary;  // AI 프로필 요약
+    private String techStack;
+
+    private String githubUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String collaborationKeywords;
+
+    @Column(columnDefinition = "TEXT")
+    private String aiSummary;
+
+    @Builder.Default
+    private Boolean isDeleted = false;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(nullable = false)
     private LocalDateTime updatedAt;
 }

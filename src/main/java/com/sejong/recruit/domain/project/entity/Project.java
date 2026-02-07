@@ -8,9 +8,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-/**
- * 프로젝트 모집 공고 엔티티
- */
 @Entity
 @Table(name = "projects")
 @Getter
@@ -26,29 +23,25 @@ public class Project {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "leader_id", nullable = false)
-    private User leader;  // 프로젝트 리더 (작성자)
+    private User leader;
 
     @Column(nullable = false)
-    private String title;  // 프로젝트 제목
+    private String title;
 
     @Column(columnDefinition = "TEXT", nullable = false)
-    private String content;  // 프로젝트 상세 설명
+    private String content;
 
-    @Column(nullable = false)
-    private String requiredRoles;  // 필요한 역할 (예: "Backend,Frontend,Designer")
+    private String requiredRoles;
 
-    private LocalDateTime deadline;  // 모집 마감일
+    private LocalDateTime deadline;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     @Builder.Default
-    private ProjectStatus status = ProjectStatus.RECRUITING;  // RECRUITING, IN_PROGRESS, COMPLETED
+    private ProjectStatus status = ProjectStatus.RECRUITING;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(nullable = false)
     private LocalDateTime updatedAt;
 }
