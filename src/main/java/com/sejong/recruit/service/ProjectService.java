@@ -29,7 +29,8 @@ public class ProjectService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public Map<String, Object> getProjects(String projectType, String techStack, int page, int size) {
+    public Map<String, Object> getProjects(String status, String search, String role,
+                                           String projectType, String techStack, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Project> projectPage;
 
@@ -41,13 +42,37 @@ public class ProjectService {
 
         List<ProjectDto.Response> content = projectPage.getContent().stream()
                 .map(ProjectDto.Response::from)
-                .filter(r -> projectType == null || projectType.isBlank() || r.getProjectType().equals(projectType))
+                .filter(r -> {
+                    // 상태 필터
+                    if (status != null && !status.isBlank() && !r.getStatus().equalsIgnoreCase(status)) {
+                        return false;
+                    }
+                    // 프로젝트 타입 필터
+                    if (projectType != null && !projectType.isBlank() && !r.getProjectType().equals(projectType)) {
+                        return false;
+                    }
+                    // 검색어 필터 (제목 + 설명)
+                    if (search != null && !search.isBlank()) {
+                        String searchLower = search.toLowerCase();
+                        boolean matchTitle = r.getTitle().toLowerCase().contains(searchLower);
+                        boolean matchDesc = r.getDescription().toLowerCase().contains(searchLower);
+                        if (!matchTitle && !matchDesc) {
+                            return false;
+                        }
+                    }
+                    // 역할(기술스택) 필터
+                    if (role != null && !role.isBlank()) {
+                        return r.getRequiredTechStacks().stream()
+                                .anyMatch(tech -> tech.equalsIgnoreCase(role));
+                    }
+                    return true;
+                })
                 .toList();
 
         Map<String, Object> result = new HashMap<>();
         result.put("content", content);
         result.put("totalPages", projectPage.getTotalPages());
-        result.put("totalElements", projectPage.getTotalElements());
+        result.put("totalElements", content.size());
         return result;
     }
 
@@ -97,6 +122,25 @@ public class ProjectService {
         project.setRequiredRoles(encodeMetadataFromUpdate(request));
         if (request.getDeadline() != null && !request.getDeadline().isBlank()) {
             project.setDeadline(LocalDateTime.parse(request.getDeadline()));
+        }
+
+        return ProjectDto.Response.from(project);
+    }
+
+    @Transactional
+    public ProjectDto.Response updateProjectStatus(Long id, String studentId, ProjectDto.StatusUpdateRequest request) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PROJECT_NOT_FOUND));
+
+        if (!project.getLeader().getStudentId().equals(studentId)) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+
+        try {
+            ProjectStatus newStatus = ProjectStatus.valueOf(request.getStatus());
+            project.setStatus(newStatus);
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
         }
 
         return ProjectDto.Response.from(project);
