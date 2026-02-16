@@ -37,6 +37,13 @@ public class ProjectDto {
     }
 
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class StatusUpdateRequest {
+        private String status;  // "IN_PROGRESS" or "COMPLETED"
+    }
+
+    @Getter
     @Builder
     @AllArgsConstructor
     public static class Response {
