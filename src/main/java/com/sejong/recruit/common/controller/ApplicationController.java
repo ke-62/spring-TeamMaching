@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/recruits/{recruitPostId}/applications")
+@RequestMapping("/v1/projects/{projectId}/applications")
 @RequiredArgsConstructor
 public class ApplicationController {
 
@@ -19,32 +19,32 @@ public class ApplicationController {
 
     @PostMapping
     public ApplicationDto.Response apply(
-            @PathVariable Long recruitPostId,
+            @PathVariable Long projectId,
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody ApplicationDto.CreateRequest request) {
-        return applicationService.applyToProject(recruitPostId, userDetails.getUsername(), request);
+        return applicationService.applyToProject(projectId, userDetails.getUsername(), request);
     }
 
     @GetMapping
     public List<ApplicationDto.Response> getApplications(
-            @PathVariable Long recruitPostId,
+            @PathVariable Long projectId,
             @AuthenticationPrincipal UserDetails userDetails) {
-        return applicationService.getApplicationsByProject(recruitPostId, userDetails.getUsername());
+        return applicationService.getApplicationsByProject(projectId, userDetails.getUsername());
     }
 
     @PatchMapping("/{applicationId}")
     public ApplicationDto.Response updateStatus(
-            @PathVariable Long recruitPostId,
+            @PathVariable Long projectId,
             @PathVariable Long applicationId,
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody ApplicationDto.UpdateStatusRequest request) {
-        return applicationService.updateApplicationStatus(recruitPostId, applicationId,
+        return applicationService.updateApplicationStatus(projectId, applicationId,
                 userDetails.getUsername(), request);
     }
 
     @DeleteMapping("/{applicationId}")
     public ApiResponse<Void> cancelApplication(
-            @PathVariable Long recruitPostId,
+            @PathVariable Long projectId,
             @PathVariable Long applicationId,
             @AuthenticationPrincipal UserDetails userDetails) {
         applicationService.cancelApplication(applicationId, userDetails.getUsername());

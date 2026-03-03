@@ -27,9 +27,13 @@ public enum ErrorCode {
     APPLICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "APP_001", "지원서를 찾을 수 없습니다."),
     DUPLICATE_APPLICATION(HttpStatus.BAD_REQUEST, "APP_002", "이미 지원한 프로젝트입니다."),
 
+    // Comment
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT_001", "댓글을 찾을 수 없습니다."),
+
     // Auth
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "AUTH_001", "인증에 실패했습니다."),
-    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AUTH_002", "토큰이 만료되었습니다.");
+    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AUTH_002", "토큰이 만료되었습니다."),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "AUTH_003", "권한이 없습니다.");
 
     private final HttpStatus status;
     private final String code;
