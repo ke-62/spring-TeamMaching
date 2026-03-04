@@ -28,9 +28,7 @@ public class SejongPortalService {
 
     @PostConstruct
     public void init() {
-        // application.yml의 테스트 계정 직접 등록
-        testAccounts.add(new TestAccount("20211234", "test1234", "이고은", "컴퓨터공학과", 3));
-        testAccounts.add(new TestAccount("20211235", "test1234", "황채영", "소프트웨어학과", 3));
+        // 테스트 계정 없음
     }
 
     public Map<String, String> authenticateAndGetStudentInfo(String studentId, String password) {

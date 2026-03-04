@@ -42,6 +42,16 @@ public class ApplicationController {
                 userDetails.getUsername(), request);
     }
 
+    @PatchMapping("/{applicationId}/memo")
+    public ApplicationDto.Response updateMemo(
+            @PathVariable Long projectId,
+            @PathVariable Long applicationId,
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody ApplicationDto.UpdateMemoRequest request) {
+        return applicationService.updateMemo(projectId, applicationId,
+                userDetails.getUsername(), request);
+    }
+
     @DeleteMapping("/{applicationId}")
     public ApiResponse<Void> cancelApplication(
             @PathVariable Long projectId,

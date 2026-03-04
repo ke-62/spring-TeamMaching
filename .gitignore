@@ -57,3 +57,7 @@ desktop.ini
 
 *.temp
 *.tmp
+--- Secrets ---
+
+.env
+application-local.yml

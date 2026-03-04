@@ -86,6 +86,24 @@ public class ApplicationService {
     }
 
     @Transactional
+    public ApplicationDto.Response updateMemo(Long projectId, Long applicationId,
+                                              String studentId, ApplicationDto.UpdateMemoRequest request) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PROJECT_NOT_FOUND));
+
+        if (!project.getLeader().getStudentId().equals(studentId)) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.APPLICATION_NOT_FOUND));
+
+        application.setMemo(request.getMemo());
+
+        return ApplicationDto.Response.from(application);
+    }
+
+    @Transactional
     public ApplicationDto.Response updateApplicationStatus(Long projectId, Long applicationId,
                                                            String studentId, ApplicationDto.UpdateStatusRequest request) {
         Project project = projectRepository.findById(projectId)

@@ -33,6 +33,17 @@ public class Application {
     @Column(columnDefinition = "TEXT")
     private String message;
 
+    @Column(columnDefinition = "TEXT")
+    private String memo;
+
+    public String getMemo() {
+        return this.memo;
+    }
+
+    public void setMemo(String memo) {
+        this.memo = memo;
+    }
+
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private ApplicationStatus status = ApplicationStatus.PENDING;

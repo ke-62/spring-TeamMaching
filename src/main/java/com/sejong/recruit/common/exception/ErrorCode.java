@@ -4,10 +4,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-/**
- * 비즈니스 에러 코드 정의
- * 각 도메인별로 에러 코드를 분리하여 관리할 수 있습니다.
- */
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {

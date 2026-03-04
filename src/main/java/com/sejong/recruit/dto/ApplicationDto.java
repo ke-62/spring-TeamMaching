@@ -19,7 +19,14 @@ public class ApplicationDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateStatusRequest {
-        private String status; // "accepted" or "rejected"
+        private String status;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateMemoRequest {
+        private String memo;
     }
 
     @Getter
@@ -33,6 +40,10 @@ public class ApplicationDto {
         private String motivation;
         private String status;
         private String createdAt;
+        private String memo;
+        private String projectTitle;
+        private String projectType;
+        private String projectStatus;
 
         public static Response from(Application application) {
             return Response.builder()
@@ -43,7 +54,21 @@ public class ApplicationDto {
                     .motivation(application.getMessage())
                     .status(application.getStatus().name().toLowerCase())
                     .createdAt(application.getCreatedAt() != null ? application.getCreatedAt().toString() : null)
+                    .memo(application.getMemo())
+                    .projectTitle(application.getProject().getTitle())
+                    .projectType(extractProjectType(application.getProject().getRequiredRoles()))
+                    .projectStatus(application.getProject().getStatus().name())
                     .build();
+        }
+
+        private static String extractProjectType(String requiredRoles) {
+            if (requiredRoles == null || requiredRoles.isBlank()) return "other";
+            for (String part : requiredRoles.split("\\|")) {
+                if (part.startsWith("projectType:")) {
+                    return part.substring("projectType:".length());
+                }
+            }
+            return "other";
         }
     }
 }

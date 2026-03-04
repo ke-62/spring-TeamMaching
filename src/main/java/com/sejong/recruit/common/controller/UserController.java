@@ -1,10 +1,12 @@
 package com.sejong.recruit.common.controller;
 
+import com.sejong.recruit.dto.ApplicationDto;
 import com.sejong.recruit.dto.UserDto;
 import com.sejong.recruit.domain.user.entity.User;
 import com.sejong.recruit.common.exception.BusinessException;
 import com.sejong.recruit.common.exception.ErrorCode;
 import com.sejong.recruit.repository.UserRepository;
+import com.sejong.recruit.service.ApplicationService;
 import com.sejong.recruit.service.GitHubService;
 import com.sejong.recruit.service.UserService;
 import lombok.Getter;
@@ -14,7 +16,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -25,6 +26,7 @@ public class UserController {
     private final UserService userService;
     private final GitHubService gitHubService;
     private final UserRepository userRepository;
+    private final ApplicationService applicationService;
 
     @GetMapping("/me")
     public UserDto getMyProfile(@AuthenticationPrincipal UserDetails userDetails) {
@@ -50,8 +52,8 @@ public class UserController {
     }
 
     @GetMapping("/me/applications")
-    public List<?> getMyApplications(@AuthenticationPrincipal UserDetails userDetails) {
-        return Collections.emptyList();
+    public List<ApplicationDto.Response> getMyApplications(@AuthenticationPrincipal UserDetails userDetails) {
+        return applicationService.getMyApplications(userDetails.getUsername());
     }
 
     @GetMapping("/me/projects")

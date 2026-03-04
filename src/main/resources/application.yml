@@ -5,11 +5,10 @@ spring:
   # MySQL 데이터베이스 설정
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/sejong_matching?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: root
-    password: "${DB_PASSWORD}"
+    url: ${DB_URL:jdbc:mysql://localhost:3306/sejong_matching?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD}
 
-  # JPA 설정
   jpa:
     hibernate:
       ddl-auto: update
@@ -25,9 +24,8 @@ spring:
               action: create
               create-target: ./build/schema.sql
 
-# JWT 설정
 jwt:
-  secret: your-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm-please-change-this-in-production
+  secret: ${JWT_SECRET:your-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm-please-change-this-in-production}
   expiration: 86400000  # 24시간 (밀리초)
   refresh-expiration: 604800000  # 7일 (밀리초)
 
@@ -44,17 +42,6 @@ sejong:
     base-url: https://portal.sejong.ac.kr
     auth-service-url: http://localhost:5001/auth
     dev-mode: false
-    test-accounts:
-      - studentId: "20211234"
-        password: "test1234"
-        name: "이고은"
-        department: "컴퓨터공학과"
-        grade: 3
-      - studentId: "20211235"
-        password: "test1234"
-        name: "황채영"
-        department: "소프트웨어학과"
-        grade: 3
 
 # 서버 설정
 server:
