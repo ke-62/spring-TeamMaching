@@ -1,11 +1,15 @@
 package com.sejong.recruit.service;
 
+import com.sejong.recruit.dto.ProjectDto;
 import com.sejong.recruit.dto.UserDto;
-import com.sejong.recruit.entity.RecruitPost;
-import com.sejong.recruit.entity.User;
-import com.sejong.recruit.repository.RecruitPostRepository;
-import com.sejong.recruit.repository.ReviewRepository;
+import com.sejong.recruit.domain.user.entity.User;
+import com.sejong.recruit.common.exception.BusinessException;
+import com.sejong.recruit.common.exception.ErrorCode;
+import com.sejong.recruit.repository.PeerReviewRepository;
+import com.sejong.recruit.repository.ProjectRepository;
 import com.sejong.recruit.repository.UserRepository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,133 +17,110 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * AI 기반 팀원 추천 서비스
- * 현재는 룰 기반 추천, 향후 AI 모델 연동 가능
- */
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class RecommendationService {
 
     private final UserRepository userRepository;
-    private final RecruitPostRepository recruitPostRepository;
-    private final ReviewRepository reviewRepository;
+    private final ProjectRepository projectRepository;
+    private final PeerReviewRepository peerReviewRepository;
+    private final ProjectService projectService;
 
-    /**
-     * 모집 공고에 적합한 팀원 추천
-     */
-    public List<RecommendedUserDto> recommendUsers(Long recruitPostId, int limit) {
-        // 모집 공고 조회
-        RecruitPost recruitPost = recruitPostRepository.findById(recruitPostId)
-                .orElseThrow(() -> new RuntimeException("모집 공고를 찾을 수 없습니다"));
+    @Transactional(readOnly = true)
+    public List<RecommendedUserDto> recommendUsers(Long projectId, int limit) {
+        ProjectDto.Response project = projectService.getProject(projectId);
 
-        // 모든 사용자 조회 (작성자 제외)
-        List<User> allUsers = userRepository.findAll().stream()
-                .filter(user -> !user.getId().equals(recruitPost.getAuthor().getId()))
-                .collect(Collectors.toList());
+        List<String> requiredTechStacks = project.getRequiredTechStacks();
+        Long leaderId = project.getAuthorId();
 
-        // 각 사용자에 대해 점수 계산
-        List<RecommendedUserDto> recommendations = allUsers.stream()
-                .map(user -> calculateMatchScore(user, recruitPost))
-                .sorted((a, b) -> Double.compare(b.getMatchScore(), a.getMatchScore()))
+        List<User> allUsers = userRepository.findAll();
+
+        List<RecommendedUserDto> scored = allUsers.stream()
+                .filter(u -> !u.getId().equals(leaderId))
+                .map(u -> {
+                    double score = calculateScore(u, requiredTechStacks);
+                    Map<String, String> reasons = calculateReasons(u, requiredTechStacks);
+                    return new RecommendedUserDto(UserDto.from(u), score, reasons);
+                })
+                .sorted(Comparator.comparingDouble(RecommendedUserDto::getMatchScore).reversed())
                 .limit(limit)
-                .collect(Collectors.toList());
+                .toList();
 
-        return recommendations;
+        return scored;
     }
 
-    /**
-     * 사용자와 모집 공고 간의 매칭 점수 계산
-     */
-    private RecommendedUserDto calculateMatchScore(User user, RecruitPost recruitPost) {
-        double score = 0.0;
-        Map<String, String> reasons = new HashMap<>();
+    private double calculateScore(User user, List<String> requiredTechStacks) {
+        double score = 0;
 
-        // 1. 기술 스택 매칭 (40점)
-        List<String> requiredTechStacks = recruitPost.getRequiredTechStacks();
-        List<String> userTechStacks = user.getTechStacks();
-
-        long matchingTechCount = requiredTechStacks.stream()
-                .filter(userTechStacks::contains)
-                .count();
-
-        double techScore = requiredTechStacks.isEmpty() ? 0 :
-                (matchingTechCount / (double) requiredTechStacks.size()) * 40;
-        score += techScore;
-
-        if (matchingTechCount > 0) {
-            reasons.put("기술 스택", String.format("%.0f%% 일치 (%d/%d)",
-                    techScore / 40 * 100, matchingTechCount, requiredTechStacks.size()));
+        // 기술 스택 매칭 (40점)
+        if (user.getTechStack() != null && requiredTechStacks != null) {
+            Set<String> userTechs = Arrays.stream(user.getTechStack().split(","))
+                    .map(String::trim)
+                    .map(String::toLowerCase)
+                    .collect(Collectors.toSet());
+            long matchCount = requiredTechStacks.stream()
+                    .filter(t -> userTechs.contains(t.toLowerCase()))
+                    .count();
+            if (!requiredTechStacks.isEmpty()) {
+                score += (matchCount * 40.0) / requiredTechStacks.size();
+            }
         }
 
-        // 2. 프로젝트 유형 관심도 (20점)
-        List<String> userInterests = user.getInterests();
-        String projectType = recruitPost.getProjectType().name().toLowerCase();
-
-        if (userInterests.contains(projectType) || userInterests.contains("전체")) {
-            score += 20;
-            reasons.put("관심 분야", "프로젝트 유형에 관심 있음");
+        // 리뷰 점수 (30점)
+        Double avgCollab = peerReviewRepository.getAverageCollaborationScore(user.getId());
+        Double avgTech = peerReviewRepository.getAverageTechnicalScore(user.getId());
+        if (avgCollab != null && avgTech != null) {
+            double avgReview = (avgCollab + avgTech) / 2.0;
+            score += (avgReview / 5.0) * 30;
         }
 
-        // 3. 평가 점수 (30점)
-        Double avgCollaboration = reviewRepository.getAverageCollaborationScore(user.getId());
-        Double avgTechnical = reviewRepository.getAverageTechnicalScore(user.getId());
-        Double avgResponsibility = reviewRepository.getAverageResponsibilityScore(user.getId());
-
-        if (avgCollaboration != null && avgTechnical != null && avgResponsibility != null) {
-            double avgScore = (avgCollaboration + avgTechnical + avgResponsibility) / 3.0;
-            double reviewScore = (avgScore / 5.0) * 30;
-            score += reviewScore;
-            reasons.put("동료 평가", String.format("평균 %.1f/5.0점", avgScore));
-        }
-
-        // 4. GitHub 활동 (10점) - 현재는 URL 유무만 체크, 향후 API 연동
-        if (user.getGithubUrl() != null && !user.getGithubUrl().isEmpty()) {
+        // GitHub 프로필 유무 (10점)
+        if (user.getGithubUrl() != null && !user.getGithubUrl().isBlank()) {
             score += 10;
-            reasons.put("GitHub", "프로필 등록됨");
         }
 
-        // DTO 생성
-        UserDto userDto = convertUserToDto(user);
+        // 프로필 완성도 (20점)
+        int completeness = 0;
+        if (user.getBio() != null && !user.getBio().isBlank()) completeness += 5;
+        if (user.getTechStack() != null && !user.getTechStack().isBlank()) completeness += 5;
+        if (user.getMajor() != null && !user.getMajor().isBlank()) completeness += 5;
+        if (user.getCollaborationKeywords() != null && !user.getCollaborationKeywords().isBlank()) completeness += 5;
+        score += completeness;
 
-        return RecommendedUserDto.builder()
-                .user(userDto)
-                .matchScore(Math.round(score * 10) / 10.0)  // 소수점 1자리
-                .matchReasons(reasons)
-                .build();
+        return Math.min(score, 100);
     }
 
-    /**
-     * User 엔티티를 UserDto로 변환
-     */
-    private UserDto convertUserToDto(User user) {
-        UserDto dto = new UserDto();
-        dto.setId(user.getId());
-        dto.setStudentId(user.getStudentId());
-        dto.setName(user.getName());
-        dto.setDepartment(user.getDepartment());
-        dto.setGrade(user.getGrade());
-        dto.setEmail(user.getEmail());
-        dto.setTechStacks(user.getTechStacks());
-        dto.setInterests(user.getInterests());
-        dto.setGithubUrl(user.getGithubUrl());
-        dto.setProfileImage(user.getProfileImage());
-        dto.setBio(user.getBio());
-        return dto;
+    private Map<String, String> calculateReasons(User user, List<String> requiredTechStacks) {
+        Map<String, String> reasons = new LinkedHashMap<>();
+
+        if (user.getTechStack() != null && requiredTechStacks != null && !requiredTechStacks.isEmpty()) {
+            Set<String> userTechs = Arrays.stream(user.getTechStack().split(","))
+                    .map(String::trim)
+                    .map(String::toLowerCase)
+                    .collect(Collectors.toSet());
+            long matchCount = requiredTechStacks.stream()
+                    .filter(t -> userTechs.contains(t.toLowerCase()))
+                    .count();
+            reasons.put("기술 스택", matchCount + "/" + requiredTechStacks.size() + " 일치");
+        }
+
+        Double avgCollab = peerReviewRepository.getAverageCollaborationScore(user.getId());
+        if (avgCollab != null) {
+            reasons.put("동료 평가", String.format("평균 %.1f점", avgCollab));
+        }
+
+        if (user.getGithubUrl() != null && !user.getGithubUrl().isBlank()) {
+            reasons.put("GitHub", "연동됨");
+        }
+
+        return reasons;
     }
 
-    /**
-     * 추천 사용자 DTO
-     */
-    @lombok.Getter
-    @lombok.Setter
-    @lombok.NoArgsConstructor
-    @lombok.AllArgsConstructor
-    @lombok.Builder
+    @Getter
+    @AllArgsConstructor
     public static class RecommendedUserDto {
         private UserDto user;
-        private Double matchScore;  // 0-100 점수
-        private Map<String, String> matchReasons;  // 추천 이유
+        private double matchScore;
+        private Map<String, String> matchReasons;
     }
 }

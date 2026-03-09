@@ -1,55 +1,74 @@
 package com.sejong.recruit.dto;
 
-import com.sejong.recruit.entity.Application;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import com.sejong.recruit.domain.recruitment.entity.Application;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 public class ApplicationDto {
-    
-    @Data
+
+    @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateRequest {
-        @NotBlank(message = "지원 동기를 입력해주세요")
-        @Size(max = 1000, message = "지원 동기는 1000자 이하로 입력해주세요")
         private String motivation;
     }
-    
-    @Data
-    @Builder
+
+    @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateStatusRequest {
+        private String status;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateMemoRequest {
+        private String memo;
+    }
+
+    @Getter
+    @Builder
     @AllArgsConstructor
     public static class Response {
         private Long id;
         private Long recruitPostId;
+        private Long applicantId;
         private UserDto applicant;
         private String motivation;
         private String status;
-        private LocalDateTime createdAt;
-        
+        private String createdAt;
+        private String memo;
+        private String projectTitle;
+        private String projectType;
+        private String projectStatus;
+
         public static Response from(Application application) {
             return Response.builder()
                     .id(application.getId())
-                    .recruitPostId(application.getRecruitPost().getId())
+                    .recruitPostId(application.getProject().getId())
+                    .applicantId(application.getApplicant().getId())
                     .applicant(UserDto.from(application.getApplicant()))
-                    .motivation(application.getMotivation())
+                    .motivation(application.getMessage())
                     .status(application.getStatus().name().toLowerCase())
-                    .createdAt(application.getCreatedAt())
+                    .createdAt(application.getCreatedAt() != null ? application.getCreatedAt().toString() : null)
+                    .memo(application.getMemo())
+                    .projectTitle(application.getProject().getTitle())
+                    .projectType(extractProjectType(application.getProject().getRequiredRoles()))
+                    .projectStatus(application.getProject().getStatus().name())
                     .build();
         }
-    }
-    
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UpdateStatusRequest {
-        @NotBlank(message = "상태를 입력해주세요")
-        private String status;  // accepted, rejected
+
+        private static String extractProjectType(String requiredRoles) {
+            if (requiredRoles == null || requiredRoles.isBlank()) return "other";
+            for (String part : requiredRoles.split("\\|")) {
+                if (part.startsWith("projectType:")) {
+                    return part.substring("projectType:".length());
+                }
+            }
+            return "other";
+        }
     }
 }

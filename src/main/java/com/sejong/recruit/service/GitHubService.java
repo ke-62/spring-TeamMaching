@@ -1,147 +1,109 @@
 package com.sejong.recruit.service;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.client.HttpClientErrorException;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-/**
- * GitHub API 연동 서비스
- * GitHub 프로필 및 레포지토리 정보를 가져옴
- */
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class GitHubService {
 
-    private static final String GITHUB_API_URL = "https://api.github.com";
     private final RestTemplate restTemplate;
 
-    public GitHubService() {
-        this.restTemplate = new RestTemplate();
-    }
+    public GitHubProfile getProfile(String githubUrl) {
+        String username = extractUsername(githubUrl);
+        if (username == null) return null;
 
-    /**
-     * GitHub 사용자 프로필 조회
-     * @param username GitHub 사용자 이름
-     */
-    public GitHubProfile getProfile(String username) {
         try {
-            String url = GITHUB_API_URL + "/users/" + username;
-            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+            String apiUrl = "https://api.github.com/users/" + username;
+            Map<String, Object> response = restTemplate.getForObject(apiUrl, Map.class);
+            if (response == null) return null;
 
-            if (response == null) {
-                throw new RuntimeException("GitHub 사용자를 찾을 수 없습니다");
-            }
-
-            return GitHubProfile.builder()
-                    .login((String) response.get("login"))
-                    .name((String) response.get("name"))
-                    .bio((String) response.get("bio"))
-                    .avatarUrl((String) response.get("avatar_url"))
-                    .publicRepos((Integer) response.get("public_repos"))
-                    .followers((Integer) response.get("followers"))
-                    .following((Integer) response.get("following"))
-                    .htmlUrl((String) response.get("html_url"))
-                    .build();
-        } catch (HttpClientErrorException.NotFound e) {
-            throw new RuntimeException("GitHub 사용자를 찾을 수 없습니다: " + username);
+            return new GitHubProfile(
+                    (String) response.get("login"),
+                    (String) response.get("name"),
+                    (String) response.get("bio"),
+                    (String) response.get("avatar_url"),
+                    (Integer) response.getOrDefault("public_repos", 0),
+                    (Integer) response.getOrDefault("followers", 0),
+                    (Integer) response.getOrDefault("following", 0),
+                    (String) response.get("html_url")
+            );
         } catch (Exception e) {
-            throw new RuntimeException("GitHub API 호출 중 오류가 발생했습니다: " + e.getMessage());
+            log.error("GitHub 프로필 조회 실패: {}", e.getMessage());
+            return null;
         }
     }
 
-    /**
-     * GitHub 레포지토리 목록 조회
-     * @param username GitHub 사용자 이름
-     * @param limit 가져올 레포지토리 개수
-     */
-    public List<GitHubRepository> getRepositories(String username, int limit) {
+    @SuppressWarnings("unchecked")
+    public List<GitHubRepository> getRepositories(String githubUrl, int limit) {
+        String username = extractUsername(githubUrl);
+        if (username == null) return Collections.emptyList();
+
         try {
-            String url = GITHUB_API_URL + "/users/" + username + "/repos?sort=updated&per_page=" + limit;
-            List<Map<String, Object>> response = restTemplate.getForObject(url, List.class);
+            String apiUrl = "https://api.github.com/users/" + username + "/repos?sort=updated&per_page=" + limit;
+            List<Map<String, Object>> response = restTemplate.getForObject(apiUrl, List.class);
+            if (response == null) return Collections.emptyList();
 
-            if (response == null) {
-                return new ArrayList<>();
-            }
-
-            List<GitHubRepository> repositories = new ArrayList<>();
-            for (Map<String, Object> repo : response) {
-                repositories.add(GitHubRepository.builder()
-                        .name((String) repo.get("name"))
-                        .description((String) repo.get("description"))
-                        .htmlUrl((String) repo.get("html_url"))
-                        .language((String) repo.get("language"))
-                        .stargazersCount((Integer) repo.get("stargazers_count"))
-                        .forksCount((Integer) repo.get("forks_count"))
-                        .isPrivate((Boolean) repo.get("private"))
-                        .build());
-            }
-
-            return repositories;
+            return response.stream()
+                    .map(repo -> new GitHubRepository(
+                            (String) repo.get("name"),
+                            (String) repo.get("description"),
+                            (String) repo.get("html_url"),
+                            (String) repo.get("language"),
+                            (Integer) repo.getOrDefault("stargazers_count", 0),
+                            (Integer) repo.getOrDefault("forks_count", 0),
+                            (Boolean) repo.getOrDefault("private", false)
+                    ))
+                    .toList();
         } catch (Exception e) {
-            throw new RuntimeException("GitHub 레포지토리 조회 중 오류가 발생했습니다: " + e.getMessage());
+            log.error("GitHub 레포지토리 조회 실패: {}", e.getMessage());
+            return Collections.emptyList();
         }
     }
 
-    /**
-     * GitHub URL에서 사용자 이름 추출
-     * @param githubUrl GitHub 프로필 URL
-     */
-    public String extractUsername(String githubUrl) {
-        if (githubUrl == null || githubUrl.isEmpty()) {
-            throw new RuntimeException("GitHub URL이 비어있습니다");
-        }
-
-        // https://github.com/username 형식에서 username 추출
-        String[] parts = githubUrl.replace("https://", "")
-                .replace("http://", "")
-                .replace("github.com/", "")
-                .split("/");
-
-        if (parts.length == 0 || parts[0].isEmpty()) {
-            throw new RuntimeException("유효하지 않은 GitHub URL입니다");
-        }
-
-        return parts[0];
+    private String extractUsername(String githubUrl) {
+        if (githubUrl == null || githubUrl.isBlank()) return null;
+        Pattern pattern = Pattern.compile("github\\.com/([a-zA-Z0-9_-]+)");
+        Matcher matcher = pattern.matcher(githubUrl);
+        return matcher.find() ? matcher.group(1) : null;
     }
 
-    /**
-     * GitHub 프로필 DTO
-     */
     @Getter
-    @Setter
-    @NoArgsConstructor
     @AllArgsConstructor
-    @Builder
+    @NoArgsConstructor
     public static class GitHubProfile {
         private String login;
         private String name;
         private String bio;
         private String avatarUrl;
-        private Integer publicRepos;
-        private Integer followers;
-        private Integer following;
+        private int publicRepos;
+        private int followers;
+        private int following;
         private String htmlUrl;
     }
 
-    /**
-     * GitHub 레포지토리 DTO
-     */
     @Getter
-    @Setter
-    @NoArgsConstructor
     @AllArgsConstructor
-    @Builder
+    @NoArgsConstructor
     public static class GitHubRepository {
         private String name;
         private String description;
         private String htmlUrl;
         private String language;
-        private Integer stargazersCount;
-        private Integer forksCount;
-        private Boolean isPrivate;
+        private int stargazersCount;
+        private int forksCount;
+        private boolean isPrivate;
     }
 }
