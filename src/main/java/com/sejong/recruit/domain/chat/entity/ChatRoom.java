@@ -2,6 +2,7 @@ package com.sejong.recruit.domain.chat.entity;
 
 import com.sejong.recruit.domain.project.entity.Project;
 import com.sejong.recruit.domain.recruitment.entity.Application;
+import com.sejong.recruit.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,9 +10,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-/**
- * 채팅방 엔티티
- */
 @Entity
 @Table(name = "chat_rooms")
 @Getter
@@ -26,12 +24,20 @@ public class ChatRoom {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user1_id")
+    private User user1;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user2_id")
+    private User user2;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "application_id")
-    private Application application;  // 지원서 기반 1:1 채팅
+    private Application application;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
-    private Project project;  // 프로젝트 팀 채팅방
+    private Project project;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
