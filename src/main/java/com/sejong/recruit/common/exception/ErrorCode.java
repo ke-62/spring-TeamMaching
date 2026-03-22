@@ -26,6 +26,10 @@ public enum ErrorCode {
     // Comment
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT_001", "댓글을 찾을 수 없습니다."),
 
+    // Chat
+    CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT_001", "채팅방을 찾을 수 없습니다."),
+    CHAT_FORBIDDEN(HttpStatus.FORBIDDEN, "CHAT_002", "채팅방 접근 권한이 없습니다."),
+
     // Auth
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "AUTH_001", "인증에 실패했습니다."),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AUTH_002", "토큰이 만료되었습니다."),
