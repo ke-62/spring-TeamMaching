@@ -7,7 +7,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DB_URL:jdbc:mysql://localhost:3306/sejong_matching?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD}
+    password: ${DB_PASSWORD:sjchollang04!}
 
   jpa:
     hibernate:
@@ -40,7 +40,7 @@ sejong:
     login-url: https://portal.sejong.ac.kr/jsp/login/loginSSL.jsp
     student-info-url: https://portal.sejong.ac.kr/user/index.do
     base-url: https://portal.sejong.ac.kr
-    auth-service-url: http://localhost:5001/auth
+    auth-service-url: http://localhost:8000/auth
     dev-mode: false
 
 # 서버 설정
