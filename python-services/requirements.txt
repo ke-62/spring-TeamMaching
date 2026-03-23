@@ -6,3 +6,4 @@ trl
 datasets
 accelerate
 sentencepiece
+sejong-univ-auth
