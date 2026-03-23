@@ -23,6 +23,11 @@ public interface PeerReviewRepository extends JpaRepository<PeerReview, Long> {
     @Query("SELECT AVG(pr.ratingTechnical) FROM PeerReview pr WHERE pr.evaluatee.id = :userId")
     Double getAverageTechnicalScore(@Param("userId") Long userId);
 
+    @Query("SELECT AVG(pr.ratingCommunication) FROM PeerReview pr WHERE pr.evaluatee.id = :userId")
+    Double getAverageCommunicationScore(@Param("userId") Long userId);
+
+    List<PeerReview> findByEvaluateeId(Long evaluateeId);
+
     Long countByEvaluatee(User evaluatee);
 
     boolean existsByEvaluatorAndEvaluateeAndProjectId(User evaluator, User evaluatee, Long projectId);

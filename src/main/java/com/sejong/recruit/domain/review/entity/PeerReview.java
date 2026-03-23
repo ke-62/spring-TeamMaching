@@ -37,6 +37,8 @@ public class PeerReview {
 
     private Integer ratingTechnical;
 
+    private Integer ratingCommunication;
+
     @Column(columnDefinition = "TEXT")
     private String reviewText;
 
