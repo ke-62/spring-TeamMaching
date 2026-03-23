@@ -32,7 +32,7 @@ jwt:
 # AI Server Configuration
 ai:
   api:
-    url: ${AI_SERVER_URL:http://localhost:5000}
+    url: ${AI_SERVER_URL:http://localhost:8000}
 
 # 세종대학교 학사정보시스템 설정
 sejong:

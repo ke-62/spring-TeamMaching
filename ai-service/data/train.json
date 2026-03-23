@@ -1,0 +1,49 @@
+[
+  {
+    "input": {
+      "userName": "홍길동",
+      "department": "컴퓨터공학과",
+      "techStacks": ["React", "Spring Boot", "MySQL"],
+      "reviews": [
+        {
+          "projectTitle": "해커톤 프로젝트",
+          "projectType": "hackathon",
+          "collaborationScore": 4,
+          "technicalScore": 5,
+          "comment": "코드 품질이 좋았어요"
+        },
+        {
+          "projectTitle": "창의학기제",
+          "projectType": "창의학기제",
+          "collaborationScore": 5,
+          "technicalScore": 4,
+          "comment": "소통을 잘 해요"
+        }
+      ],
+      "totalProjects": 2,
+      "averageCollaboration": 4.5,
+      "averageTechnical": 4.5
+    },
+    "output": "백엔드 및 프론트엔드 개발 능력을 고루 갖춘 풀스택 개발자로, React와 Spring Boot 기술 스택을 보유하고 있습니다. 총 2개의 프로젝트에 참여하였으며 기술 점수 4.5점, 협업 점수 4.5점으로 고른 역량을 보여주었습니다. 코드 품질이 우수하고 팀원과의 소통 능력이 뛰어나 협업 프로젝트에 적합한 인재입니다."
+  },
+  {
+    "input": {
+      "userName": "김민수",
+      "department": "소프트웨어학과",
+      "techStacks": ["Python", "Django", "PostgreSQL", "Docker"],
+      "reviews": [
+        {
+          "projectTitle": "졸업 프로젝트",
+          "projectType": "졸업프로젝트",
+          "collaborationScore": 3,
+          "technicalScore": 5,
+          "comment": "기술적으로 뛰어나고 문제 해결 능력이 탁월합니다"
+        }
+      ],
+      "totalProjects": 1,
+      "averageCollaboration": 3.0,
+      "averageTechnical": 5.0
+    },
+    "output": "Python과 Django를 주력으로 하는 백엔드 개발자로, Docker 기반 배포 경험까지 보유한 실력파입니다. 기술 점수 5.0점으로 문제 해결 능력과 기술 역량이 매우 우수하며, 협업 점수는 3.0점으로 소통 측면에서 성장 가능성이 있습니다. 심화 기술 역량이 요구되는 프로젝트에 특히 강점을 발휘할 수 있습니다."
+  }
+]
