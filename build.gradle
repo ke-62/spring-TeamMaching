@@ -32,8 +32,8 @@ dependencies {
     // Swagger (OpenAPI 3)
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
-    // Database (H2는 개발용, MySQL은 실제 운영용)
-    runtimeOnly 'com.mysql:mysql-connector-j'
+    // Database (H2는 개발용, PostgreSQL은 Supabase용)
+    runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'com.h2database:h2'
 
     // JWT (0.12.3 버전)

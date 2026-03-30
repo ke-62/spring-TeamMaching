@@ -2,12 +2,12 @@ spring:
   application:
     name: team-recruit-platform
 
-  # MySQL 데이터베이스 설정
+  # PostgreSQL 데이터베이스 설정 (Supabase)
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DB_URL:jdbc:mysql://localhost:3306/sejong_matching?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:sjchollang04!}
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/sejong_matching}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:}
 
   jpa:
     hibernate:
@@ -16,7 +16,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
       javax:
         persistence:
           schema-generation:
@@ -40,7 +40,7 @@ sejong:
     login-url: https://portal.sejong.ac.kr/jsp/login/loginSSL.jsp
     student-info-url: https://portal.sejong.ac.kr/user/index.do
     base-url: https://portal.sejong.ac.kr
-    auth-service-url: http://localhost:8000/auth
+    auth-service-url: ${AUTH_SERVICE_URL:http://localhost:8000/auth}
     dev-mode: false
 
 # 서버 설정
