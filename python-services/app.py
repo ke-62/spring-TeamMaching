@@ -9,6 +9,9 @@ from sejong_univ_auth import auth, DosejongSession
 
 app = Flask(__name__)
 
+# 앱 시작 시 모델 로드 (gunicorn 환경에서도 동작)
+load_model()
+
 
 # ── AI 프로필 분석 ─────────────────────────────────────────────────────────────
 @app.route("/analyze-profile", methods=["POST"])
@@ -73,5 +76,4 @@ def health():
 
 
 if __name__ == "__main__":
-    load_model()
     app.run(host="0.0.0.0", port=8000, debug=False)
